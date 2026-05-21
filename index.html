@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Galaga de Palabras - Torneo Eliminatorio</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <!-- Canvas del juego -->
+        <canvas id="gameCanvas" width="1200" height="600"></canvas>
+        
+        <!-- Interfaz de usuario -->
+        <div class="ui-overlay">
+            <div class="stats">
+                <div class="stat">
+                    <span class="stat-label">❤️ Vidas:</span>
+                    <span class="stat-value" id="lives">3</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">⭐ Puntos:</span>
+                    <span class="stat-value" id="score">0</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">⚡ Campo fuerza:</span>
+                    <span class="stat-value" id="forceField">3</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">🎯 Nivel:</span>
+                    <span class="stat-value" id="level">1</span>
+                </div>
+            </div>
+            
+            <div class="word-display-area">
+                <div class="current-word-label">🎯 PALABRA ACTUAL 🎯</div>
+                <div class="current-word-display" id="targetWord">---</div>
+                <div class="word-progress">
+                    Progreso: <span id="wordProgress">0</span> / <span id="wordLength">0</span>
+                </div>
+                <div class="typing-indicator" id="typingIndicator"></div>
+            </div>
+            
+            <div class="powerup-indicator" id="powerupIndicator" style="display: none;">
+                ⚡ ¡TRABALENGUA! ⚡
+                <div id="tongueTwister"></div>
+                <div class="timer" id="powerupTimer">2.5s</div>
+                <div class="powerup-instruction">¡Escríbelo rápido!</div>
+            </div>
+            
+            <div class="controls-info">
+                <span>📝 ¡ESCRIBE DIRECTAMENTE EN EL TECLADO!</span>
+                <span>🔘 ENTER: Campo de fuerza (3 usos)</span>
+                <span>⌫ BACKSPACE: Corregir letra</span>
+            </div>
+        </div>
+        
+        <div class="game-over" id="gameOver" style="display: none;">
+            <h2>💀 GAME OVER 💀</h2>
+            <p>Puntuación final: <span id="finalScore">0</span></p>
+            <button onclick="location.reload()">🔄 Jugar de nuevo</button>
+        </div>
+    </div>
+    
+    <script src="words.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>
