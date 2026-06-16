@@ -1,6 +1,6 @@
 // ========================================================================
 // GALAGA DE PALABRAS - Typing of tha Rusth
-// VERSIÓN CON JEFES CADA 2 NIVELES, SIN ATAQUES NUMÉRICOS, PUNTAJE POR LETRA
+// VERSIÓN CON nave.png Y MOVIMIENTO MUY SUAVE (VELOCIDAD 0.3)
 // ========================================================================
 
 const canvas = document.getElementById('gameCanvas');
@@ -16,6 +16,8 @@ const startButton = document.getElementById('startButton');
 const restartButton = document.getElementById('restartButton');
 const finalScoreSpan = document.getElementById('finalScore');
 const finalLevelSpan = document.getElementById('finalLevel');
+const finalLivesSpan = document.getElementById('finalLives');
+const finalMessageSpan = document.getElementById('finalMessage');
 
 const livesElement = document.getElementById('lives');
 const scoreElement = document.getElementById('score');
@@ -43,7 +45,7 @@ let isBossFight = false;
 let bossText = "";
 let bossStartTime = 0;
 let bossSpawnTime = 0;
-let bossApproachTime = 120000; // se ajusta por nivel
+let bossApproachTime = 120000;
 let bossX = canvas.width/2, bossY = 80;
 let bossStartX, bossStartY, bossTargetX, bossTargetY;
 let bossAngle = 0;
@@ -57,13 +59,15 @@ let ultimaTecla = "";
 let tiempoTecla = 0;
 let levelComplete = false;
 
-// Nave y animación
+// Nave (con movimiento muy suave)
 let nave = {
     x: canvas.width/2,
     y: canvas.height/2,
+    img: null,
+    size: 50,
     offsetX: 0,
     offsetDir: 1,
-    img: null
+    speed: 0.3  // velocidad de movimiento lateral (MUY LENTA)
 };
 
 // Imágenes del jefe
@@ -167,7 +171,10 @@ function dibujarExplosiones() {
 function cargarImagenes() {
     nave.img = new Image();
     nave.img.src = 'img/nave.png';
-    nave.img.onerror = () => { nave.img = null; };
+    nave.img.onerror = () => { 
+        console.warn('No se pudo cargar nave.png, usando dibujo por defecto'); 
+        nave.img = null; 
+    };
     bossImgNormal = new Image();
     bossImgNormal.src = 'img/jefe_base.png';
     bossImgNormal.onerror = () => { bossImgNormal = null; };
@@ -177,12 +184,13 @@ function cargarImagenes() {
 }
 
 // ================================
-//  DIBUJO DE LA NAVE
+//  DIBUJO DE LA NAVE (CON MOVIMIENTO SUAVE)
 // ================================
 function dibujarNave() {
+    const size = nave.size;
     const drawX = nave.x + nave.offsetX;
     if (nave.img && nave.img.complete && nave.img.naturalWidth > 0) {
-        ctx.drawImage(nave.img, drawX - 25, nave.y - 25, 50, 50);
+        ctx.drawImage(nave.img, drawX - size/2, nave.y - size/2, size, size);
     } else {
         ctx.save();
         ctx.shadowBlur = 10;
@@ -207,11 +215,22 @@ function dibujarNave() {
         ctx.restore();
     }
 }
-function actualizarAnimacionNave() {
+
+// ================================
+//  ACTUALIZAR MOVIMIENTO SUAVE DE LA NAVE
+// ================================
+function actualizarMovimientoNave() {
     if (!gameRunning) return;
-    nave.offsetX += nave.offsetDir * 0.8;
-    if (nave.offsetX > 8) nave.offsetDir = -1;
-    if (nave.offsetX < -8) nave.offsetDir = 1;
+    nave.offsetX += nave.offsetDir * nave.speed;
+    const limite = 30; // límite de desplazamiento (30px a cada lado)
+    if (nave.offsetX > limite) {
+        nave.offsetX = limite;
+        nave.offsetDir = -1;
+    }
+    if (nave.offsetX < -limite) {
+        nave.offsetX = -limite;
+        nave.offsetDir = 1;
+    }
 }
 
 // ================================
@@ -299,15 +318,15 @@ function actualizarPalabras() {
     for (let i = 0; i < palabrasActivas.length; i++) {
         const p = palabrasActivas[i];
         if (p.esJefe) continue;
-        p.targetX = nave.x;
+        p.targetX = nave.x + nave.offsetX;
         p.targetY = nave.y;
         const dx = p.targetX - p.x;
         const dy = p.targetY - p.y;
         const dist = Math.hypot(dx, dy);
         if (dist > 10) {
             p.angulo += 0.03;
-            const curvaX = Math.sin(p.angulo) * p.radioCurvatura * 0.015;
-            const curvaY = Math.cos(p.angulo) * p.radioCurvatura * 0.015;
+            const curvaX = Math.sin(p.angulo) * p.radioCurvatura * 0.01;
+            const curvaY = Math.cos(p.angulo) * p.radioCurvatura * 0.01;
             const dirX = (dx / dist) * p.velocidad + curvaX;
             const dirY = (dy / dist) * p.velocidad + curvaY;
             p.x += dirX;
@@ -335,7 +354,6 @@ function actualizarPalabras() {
 // ================================
 function actualizarJefe() {
     if (!isBossFight) return;
-    // Movimiento circular + acercamiento
     bossAngle += 0.02;
     const radio = 150;
     const offsetX = Math.cos(bossAngle) * radio;
@@ -343,11 +361,11 @@ function actualizarJefe() {
     const ahora = Date.now();
     const tiempoTranscurrido = ahora - bossSpawnTime;
     const factor = Math.min(1, tiempoTranscurrido / bossApproachTime);
-    bossTargetX = nave.x;
+    bossTargetX = nave.x + nave.offsetX;
     bossTargetY = nave.y;
     bossX = bossStartX + (bossTargetX - bossStartX) * factor + offsetX * (1 - factor);
     bossY = bossStartY + (bossTargetY - bossStartY) * factor + offsetY * (1 - factor);
-    if (Math.hypot(bossX - nave.x, bossY - nave.y) < 45) {
+    if (Math.hypot(bossX - (nave.x + nave.offsetX), bossY - nave.y) < 45) {
         perderTodasLasVidas();
         return;
     }
@@ -366,14 +384,14 @@ function generarPalabra() {
     if (currentWordIndex >= wordsForLevel.length) return;
     if (isBossFight) return;
     const word = wordsForLevel[currentWordIndex++];
-    const lado = Math.floor(Math.random() * 3); // arriba, derecha, izquierda
+    const lado = Math.floor(Math.random() * 3);
     let x, y;
     switch(lado) {
         case 0: x = Math.random() * canvas.width; y = -40; break;
         case 1: x = canvas.width + 40; y = Math.random() * canvas.height; break;
         default: x = -40; y = Math.random() * canvas.height;
     }
-    const velocidadBase = 0.4 + (currentLevel - 1) * 0.2;
+    const velocidadBase = 0.3 + (currentLevel - 1) * 0.15;
     palabrasActivas.push({
         id: Date.now() + Math.random(),
         texto: word,
@@ -381,7 +399,8 @@ function generarPalabra() {
         velocidad: velocidadBase,
         angulo: Math.random() * Math.PI * 2,
         radioCurvatura: 50 + Math.random() * 150,
-        targetX: nave.x, targetY: nave.y,
+        targetX: nave.x + nave.offsetX,
+        targetY: nave.y,
         seleccionada: false,
         esJefe: false
     });
@@ -428,12 +447,11 @@ function initLevel() {
             typingIndicator.innerHTML = "✏️ ESCRIBE LA PRIMERA LETRA ✏️";
     }, 2000);
     iniciarSpawneo();
-    // generar palabras iniciales
     for (let i = 0; i < 2; i++) setTimeout(() => generarPalabra(), i * 800);
 }
 
 // ================================
-//  INICIAR JEFE (CADA 2 NIVELES, CON TIEMPO PROGRESIVO)
+//  INICIAR JEFE
 // ================================
 function iniciarJefe() {
     if (isBossFight) return;
@@ -441,10 +459,7 @@ function iniciarJefe() {
     isBossFight = true;
     const levelData = getWordsForLevel(currentLevel);
     bossText = levelData.bossText;
-    // Tiempo base: 120 segundos (120000 ms) para el primer jefe (nivel 2)
-    // Cada jefe sucesivo resta 15 segundos (15000 ms)
-    // nivel 2: 120s, nivel 4: 105s, nivel 6: 90s, nivel 8: 75s, nivel 10: 60s
-    const bossIndex = currentLevel / 2; // 1,2,3,4,5
+    const bossIndex = currentLevel / 2;
     bossApproachTime = Math.max(60000, 120000 - (bossIndex - 1) * 15000);
     bossStartTime = Date.now();
     bossSpawnTime = Date.now();
@@ -453,7 +468,7 @@ function iniciarJefe() {
     bossStartY = -80;
     bossX = bossStartX;
     bossY = bossStartY;
-    bossTargetX = nave.x;
+    bossTargetX = nave.x + nave.offsetX;
     bossTargetY = nave.y;
     currentWord = bossText;
     userProgress = "";
@@ -473,7 +488,7 @@ function perderVida(causa) {
     if (!gameRunning) return;
     lives--;
     updateUI();
-    crearExplosion(nave.x, nave.y, "grande");
+    crearExplosion(nave.x + nave.offsetX, nave.y, "grande");
     canvas.style.animation = 'shake 0.3s ease-in-out';
     setTimeout(() => canvas.style.animation = '', 300);
     if (lives <= 0) gameOver();
@@ -482,7 +497,7 @@ function perderVida(causa) {
 function perderTodasLasVidas() {
     if (!gameRunning) return;
     for (let i = 0; i < 20; i++)
-        setTimeout(() => crearExplosion(nave.x + (Math.random()-0.5)*100, nave.y + (Math.random()-0.5)*100, "grande"), i*50);
+        setTimeout(() => crearExplosion(nave.x + nave.offsetX + (Math.random()-0.5)*100, nave.y + (Math.random()-0.5)*100, "grande"), i*50);
     canvas.style.animation = 'shake 0.5s ease-in-out';
     typingIndicator.innerHTML = "💀 ¡EL JEFE TE CHOCO! ¡PIERDES TODAS LAS VIDAS! 💀";
     lives = 0;
@@ -533,7 +548,6 @@ function dispararLetra(letra) {
     ultimaTecla = letra;
     tiempoTecla = Date.now();
 
-    // Escritura del jefe
     if (isBossFight && currentWord === bossText) {
         const esperada = bossText[userProgress.length];
         if (esperada && letra.toLowerCase() === esperada.toLowerCase()) {
@@ -554,7 +568,6 @@ function dispararLetra(letra) {
         return;
     }
 
-    // Modo normal: seleccionar o continuar palabra
     if (esperandoPrimeraLetra) {
         if (!seleccionarYDisparar(letra)) {
             typingIndicator.innerHTML = `❌ No hay palabra que empiece con "${letra.toUpperCase()}" ❌`;
@@ -584,12 +597,12 @@ function dispararLetra(letra) {
 }
 
 // ================================
-//  COMPLETAR PALABRA / JEFE (con puntuación por letra)
+//  COMPLETAR PALABRA / JEFE
 // ================================
 function completarPalabra() {
     const letrasAcertadas = currentWord.length;
     const puntosTotales = (letrasAcertadas * 500) - wordPenalties;
-    score += puntosTotales;  // puede ser negativo
+    score += puntosTotales;
     updateUI();
 
     if (isBossFight && currentWord === bossText) {
@@ -610,7 +623,6 @@ function completarPalabra() {
     updateWordDisplay();
     typingIndicator.innerHTML = `🎯 ${puntosTotales >= 0 ? '+' : ''}${Math.floor(puntosTotales)} pts: "${currentWord}" destruida 🎯`;
 
-    // Si no hay palabras activas y aún quedan por generar, generar una inmediatamente
     if (!isBossFight && palabrasActivas.length === 0 && currentWordIndex < wordsForLevel.length) {
         generarPalabra();
     }
@@ -690,6 +702,8 @@ function gameOver() {
     if (spawnInterval) clearInterval(spawnInterval);
     finalScoreSpan.textContent = Math.floor(score);
     finalLevelSpan.textContent = currentLevel;
+    finalLivesSpan.textContent = lives;
+    finalMessageSpan.textContent = "💀 ¡HAS SIDO DERROTADO! 💀";
     gameOverScreen.style.display = "flex";
     uiOverlay.style.display = "none";
 }
@@ -698,9 +712,11 @@ function gameWin() {
     if (spawnInterval) clearInterval(spawnInterval);
     finalScoreSpan.textContent = Math.floor(score);
     finalLevelSpan.textContent = currentLevel;
+    finalLivesSpan.textContent = lives;
+    finalMessageSpan.textContent = "🏆 ¡VICTORIA! HAS SALVADO LA GALAXIA 🏆";
     gameOverScreen.style.display = "flex";
     uiOverlay.style.display = "none";
-    document.querySelector('#gameOver h2').textContent = "🏆 ¡VICTORIA! 🏆";
+    document.querySelector('#gameOver h2').style.color = "#ffd700";
 }
 
 // ================================
@@ -721,6 +737,8 @@ function startGame() {
     palabrasActivas = [];
     palabraSeleccionada = null;
     levelComplete = false;
+    nave.offsetX = 0;
+    nave.offsetDir = 1;
     if (spawnInterval) clearInterval(spawnInterval);
     startScreen.style.display = "none";
     uiOverlay.style.display = "block";
@@ -756,7 +774,7 @@ function handleKeyDown(e) {
             if (sig === ' ') {
                 userProgress += ' ';
                 updateWordDisplay();
-                registrarDisparo('␣', palabraSeleccionada ? palabraSeleccionada.x : nave.x, palabraSeleccionada ? palabraSeleccionada.y : nave.y);
+                registrarDisparo('␣', palabraSeleccionada ? palabraSeleccionada.x : nave.x + nave.offsetX, palabraSeleccionada ? palabraSeleccionada.y : nave.y);
                 if (userProgress.length === currentWord.length) completarPalabra();
             }
         }
@@ -777,8 +795,8 @@ function gameLoop() {
         actualizarEstrellas();
         actualizarExplosiones();
         actualizarPalabras();
+        actualizarMovimientoNave();
         if (isBossFight) actualizarJefe();
-        actualizarAnimacionNave();
         if (laserEffect.activo) {
             laserEffect.framesRestantes--;
             if (laserEffect.framesRestantes <= 0) laserEffect.activo = false;

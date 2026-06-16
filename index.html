@@ -8,6 +8,7 @@
 </head>
 <body>
     <div class="game-container">
+        <!-- Encabezado -->
         <div class="game-header">
             <div class="logo-area">
                 <img src="img/logo.png" alt="Logo" class="game-logo" id="gameLogo">
@@ -16,20 +17,22 @@
             <div class="header-spacer"></div>
         </div>
 
+        <!-- Canvas del juego -->
         <canvas id="gameCanvas" width="1200" height="600"></canvas>
 
+        <!-- Pantalla de inicio -->
         <div id="startScreen" class="start-screen">
             <h2>⚡ GALAGA DE PALABRAS ⚡</h2>
             <p>Escribe las palabras para destruir las naves enemigas.</p>
-            <p>🔫 Cada letra correcta = disparo<br>
+            <p>🔫 Cada letra correcta = 500 puntos<br>
             ❌ Error = -200 puntos<br>
             ⚡ Campo de fuerza: ENTER (3 usos totales)<br>
-            💖 Palabra difícil por nivel: +1 vida extra<br>
-            👾 Jefes cada 2 niveles: escribe el texto completo en 60 segundos antes de que choque (pierdes todas las vidas)<br>
-            🚀 Nave con animación de vuelo</p>
+            👾 Jefes cada 2 niveles: escribe el texto completo antes de que choque<br>
+            ⏱️ Primer jefe: 120s | Cada jefe: -15s</p>
             <button id="startButton">COMENZAR JUEGO</button>
         </div>
 
+        <!-- Interfaz de juego -->
         <div class="ui-overlay" id="uiOverlay" style="display: none;">
             <div class="stats">
                 <div class="stat">❤️ Vidas: <span id="lives">3</span></div>
@@ -42,12 +45,6 @@
                 <div class="word-progress">Progreso: <span id="wordProgress">0</span> / <span id="wordLength">0</span></div>
                 <div class="typing-indicator" id="typingIndicator">✏️ ESCRIBE LA PRIMERA LETRA ✏️</div>
             </div>
-            <div class="powerup-indicator" id="powerupIndicator" style="display: none;">
-                ⚡ ¡PALABRA DIFÍCIL! ⚡
-                <div id="tongueTwister"></div>
-                <div class="timer" id="powerupTimer">8.0s</div>
-                <div class="powerup-instruction">+1 VIDA EXTRA</div>
-            </div>
             <div class="controls-info">
                 <span>📝 ESCRIBE DIRECTAMENTE</span>
                 <span>🔘 ENTER: Campo de fuerza</span>
@@ -55,11 +52,26 @@
             </div>
         </div>
 
+        <!-- Pantalla de fin del juego (mejorada) -->
         <div id="gameOver" class="game-over" style="display: none;">
-            <h2>💀 GAME OVER 💀</h2>
-            <p>Puntuación final: <span id="finalScore">0</span></p>
-            <p>Nivel alcanzado: <span id="finalLevel">1</span></p>
-            <button id="restartButton">🔄 Jugar de nuevo</button>
+            <div class="game-over-content">
+                <h2 id="finalMessage">💀 GAME OVER 💀</h2>
+                <div class="game-over-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">⭐ PUNTUACIÓN</span>
+                        <span class="stat-value" id="finalScore">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">📈 NIVEL</span>
+                        <span class="stat-value" id="finalLevel">1</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">❤️ VIDAS</span>
+                        <span class="stat-value" id="finalLives">3</span>
+                    </div>
+                </div>
+                <button id="restartButton">🔄 JUGAR DE NUEVO</button>
+            </div>
         </div>
     </div>
 
