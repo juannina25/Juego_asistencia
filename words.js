@@ -1,119 +1,32 @@
-// Base de datos de palabras por nivel e idioma
+// Base de datos de palabras por nivel (sin caracteres especiales)
 const WORDS_DB = {
-    // Niveles 1-2: Español
-    1: {
-        language: "Español",
-        words: ["SOL", "LUNA", "NAVE", "ESTRELLA", "GALAXIA", "COMETA", "ASTEROIDE", "ORION", "SATURNO", "MARTE", "JUPITER", "URANO"],
-        boss: "EL CIELO ESTRELLADO"
-    },
-    2: {
-        language: "Español",
-        words: ["TELESCOPIO", "NEBULOSA", "SUPERNOVA", "GRAVEDAD", "ORBITA", "ECLIPSE", "METEORO", "COSMOS", "UNIVERSO", "VIA LACTEA", "AGUJERO NEGRO", "ENANA BLANCA"],
-        boss: "LA EXPLORACION ESPACIAL"
-    },
-    
-    // Niveles 3-4: Inglés
-    3: {
-        language: "Inglés",
-        words: ["STAR", "MOON", "ROCKET", "PLANET", "ORBIT", "SOLAR", "SPACE", "COSMIC", "NEBULA", "ASTEROID", "COMET", "MARS"],
-        boss: "THE FINAL FRONTIER"
-    },
-    4: {
-        language: "Inglés",
-        words: ["GALAXY", "TELESCOPE", "SATELLITE", "GRAVITY", "ATMOSPHERE", "EXPLORATION", "INTERSTELLAR", "SUPERNOVA", "BLACKHOLE", "ANDROMEDA", "MILKY WAY", "LIGHT YEAR"],
-        boss: "BEYOND THE UNIVERSE"
-    },
-    
-    // Niveles 5-6: Portugués
-    5: {
-        language: "Português",
-        words: ["ESTRELA", "NAVE", "COMETA", "PLANETA", "ORBITA", "SATURNO", "MARTE", "JUPITER", "URANO", "NETUNO", "SOL", "LUA"],
-        boss: "EXPLORAÇÃO ESTELAR"
-    },
-    6: {
-        language: "Português",
-        words: ["GALÁXIA", "TELESCÓPIO", "ASTEROIDE", "GRAVIDADE", "NEBULOSA", "SUPERNOVA", "COSMOS", "UNIVERSO", "CONSTELAÇÃO", "BURACO NEGRO", "ESTRELA CADENTE", "SATÉLITE"],
-        boss: "VIAGEM INTERGALÁCTICA"
-    },
-    
-    // Niveles 7-8: Aimara (Aymara)
-    7: {
-        language: "Aymara",
-        words: ["ALAXA", "ARUMA", "URU", "PACHA", "WARA", "PHATHA", "K'AYRA", "JACH'A", "QHANTATA", "ILLAPA", "WILA", "THAYA"],
-        boss: "ALAX PACHA"
-    },
-    8: {
-        language: "Aymara",
-        words: ["WILA", "QHANTU", "ANATA", "MARKA", "QULLA", "THAYA", "CH'AMAKA", "PHUYSI", "JALLU", "CHHUKU", "K'ARI", "P'IQI"],
-        boss: "JACH'A QHANTU"
-    },
-    
-    // Niveles 9-10: Mezcla + velocidad alta
-    9: {
-        language: "Mezcla",
-        words: ["ESTRELLA", "GALAXY", "COMETA", "UNIVERSO", "STARDUST", "NEBULOSA", "COSMOS", "PLANETA", "ORBIT", "METEORITO", "ASTEROID", "ESPACIO"],
-        boss: "COSMIC VOYAGE"
-    },
-    10: {
-        language: "Mezcla",
-        words: ["SUPERNOVA", "GRAVEDAD", "TELESCOPIO", "SATELLITE", "ATMOSPHERE", "EXPLORATION", "CONSTELLATION", "ANDROMEDA", "BURACO NEGRO", "SUPERMASSIVE", "INTERGALACTIC", "COSMIC VOYAGE"],
-        boss: "THE ETERNAL COSMOS"
-    }
+    1: { language: "Espanol", words: ["SOL","LUNA","NAVE","ESTRELLA","GALAXIA","COMETA","ASTEROIDE","ORION","SATURNO","MARTE"] },
+    2: { language: "Espanol", words: ["TELESCOPIO","NEBULOSA","SUPERNOVA","GRAVEDAD","ORBITA","ECLIPSE","METEORO","COSMOS","UNIVERSO","VIA LACTEA"] },
+    3: { language: "Ingles", words: ["STAR","MOON","ROCKET","PLANET","ORBIT","SOLAR","SPACE","COSMIC","NEBULA","ASTEROID"] },
+    4: { language: "Ingles", words: ["GALAXY","TELESCOPE","SATELLITE","GRAVITY","ATMOSPHERE","EXPLORATION","INTERSTELLAR","SUPERNOVA","BLACKHOLE","ANDROMEDA"] },
+    5: { language: "Portugues", words: ["ESTRELA","NAVE","COMETA","PLANETA","ORBITA","SATURNO","MARTE","JUPITER","URANO","NETUNO"] },
+    6: { language: "Portugues", words: ["GALAXIA","TELESCOPIO","ASTEROIDE","GRAVIDADE","NEBULOSA","SUPERNOVA","COSMOS","UNIVERSO","CONSTELACAO","BURACO NEGRO"] },
+    7: { language: "Aymara", words: ["ALAXA","ARUMA","URU","PACHA","WARA","PHATHA","KAYRA","JACHA","QHANTATA","ILLAPA"] },
+    8: { language: "Aymara", words: ["WILA","QHANTU","ANATA","MARKA","QULLA","THAYA","CHAMAKA","PHUYSI","JALLU","CHHUKU"] },
+    9: { language: "Mezcla", words: ["ESTRELLA","GALAXY","COMETA","UNIVERSO","STARDUST","NEBULOSA","COSMOS","PLANETA","ORBIT","METEORITO"] },
+    10: { language: "Mezcla", words: ["SUPERNOVA","GRAVEDAD","TELESCOPIO","SATELLITE","ATMOSPHERE","EXPLORATION","CONSTELLATION","ANDROMEDA","BURACO NEGRO","SUPERMASSIVE"] }
 };
 
-// Palabras difíciles para vidas extra (máximo 15 caracteres)
-const HARD_WORDS = [
-    "EXTRATERRESTRE",
-    "INCONSTITUCIONAL",
-    "ELECTRODOMESTICO",
-    "CIRCUNLOQUIO",
-    "PARADIGMATICO",
-    "MAGNANIMAMENTE",
-    "INCONSECUENTE",
-    "DESAFORTUNADO",
-    "EXTRAORDINARIO",
-    "INVEROSIMIL",
-    "CONTRADICCION",
-    "INDEPENDIENTE",
-    "RESPLANDECIENTE",
-    "TRASCENDENTAL",
-    "MULTIDIMENSIONAL"
-];
+// Textos para los jefes (en español, sin puntuación)
+// El tiempo se calcula automáticamente: 120s primer jefe, luego 105, 90, 75, 60
+const BOSS_TEXTS = {
+    2: "ESCRIBE ESTE TEXTO PARA DERROTAR AL PRIMER JEFE TIENES DOS MINUTOS DEBERAS TECLEARLO COMPLETAMENTE ANTES DE QUE EL JEFE CHOQUE CON TU NAVE CONCENTRATE Y HAZLO RAPIDO CADA LETRA CORRECTA SUMA PUNTOS PERO LOS ERRORES RESTAN",
+    4: "SEGUNDO JEFE TIENES UN MINUTO CON CUARENTA Y CINCO SEGUNDOS EL TEXTO ES MAS LARGO Y DEBERAS TENER CUIDADO CON LOS ERRORES LA PRESION AUMENTA PERO SI HAS LLEGADO HASTA AQUI ES PORQUE ERES BUENO SIGUE ASI Y DERROTA A ESTE ENEMIGO",
+    6: "TERCER JEFE AHORA TIENES SOLO UN MINUTO Y MEDIO LA VELOCIDAD Y PRECISION SON CLAVE NO TE EQUIVOQUES DEMASIADO PORQUE CADA ERROR TE RESTA PUNTOS EL TEXTO ES EXTENSO PERO PUEDES LOGRARLO CONCENTRACION TOTAL",
+    8: "CUARTO JEFE TIEMPO DISMINUIDO A UN MINUTO CON QUINCE SEGUNDOS ESTE ES UN DESAFIO SERIO LOS ERRORES SE CASTIGAN DURAMENTE PERO LA RECOMPENSA ES GRANDE DEMUESTRA QUE ERES UN MECANOGRAFO EXPERTO",
+    10: "JEFE FINAL SOLO TIENES UN MINUTO ESTE ES EL TEXTO MAS LARGO Y DIFICIL SI LO COMPLETAS GANAS EL JUEGO CADA LETRA CUENTA NO TE EQUIVOQUES CONCENTRATE RESPIRA HONDO Y TECLEA CON TODA TU VELOCIDAD EL DESTINO DE LA HUMANIDAD ESTA EN TUS MANOS TYPING OF THA RUSTH"
+};
 
-// Trabalenguas para jefes
-const TONGUE_TWISTERS = [
-    "TRES TRISTES TIGRES",
-    "PABLITO CLAVO UN CLAVITO",
-    "EL CIELO ESTA ENLADRILLADO",
-    "COMO POCO COCO COMO",
-    "PEPE PECAS PICA PAPAS",
-    "ERRE CON ERRE CIGARRO",
-    "ERES UN LENTO LAMENTO",
-    "TRABALENGUAS TRABAJOSO",
-    "EL VOLCAN DE PARANGARICUTIRIMICUARO",
-    "RAPIDAS PALABRAS RAPIDAS",
-    "TRES TIGRES TRIGO TRAGABAN",
-    "PAN PAN VINO VINO"
-];
-
-// Función para obtener palabras de un nivel
 function getWordsForLevel(level) {
-    const levelData = WORDS_DB[level];
-    if (!levelData) return WORDS_DB[10];
-    
+    const levelData = WORDS_DB[level] || WORDS_DB[10];
     return {
         language: levelData.language,
         words: [...levelData.words],
-        boss: levelData.boss
+        bossText: BOSS_TEXTS[level] || "TEXTO DE PRACTICA PARA EL JEFE DEBES ESCRIBIRLO RAPIDO"
     };
-}
-
-// Obtener palabra difícil aleatoria
-function getRandomHardWord() {
-    return HARD_WORDS[Math.floor(Math.random() * HARD_WORDS.length)];
-}
-
-// Obtener trabalengua aleatorio para jefe
-function getRandomTongueTwister() {
-    return TONGUE_TWISTERS[Math.floor(Math.random() * TONGUE_TWISTERS.length)];
 }
